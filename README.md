@@ -1,2 +1,2 @@
-# lite-license-manager
+# Raisensu
 A simple license asset management tool.
