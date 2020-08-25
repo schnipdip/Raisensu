@@ -30,6 +30,5 @@ A simple license asset management tool.
 ## TODO:
 
 - Delete all assets
-- Export database to CSV
 - Select NAME output
-- Add LICENSE expiration
+- Monitor LICENSE expiration and send notifaction
