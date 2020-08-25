@@ -12,10 +12,9 @@ class encrypto():
         return (open(self.key, 'rb').read())
 
     def encrypt(self, license):
-        '''
-            Encrypt the license
-        '''
-
+        
+        #Encrypt the license
+        
         block = encrypto.load_key(self)
 
         encoded_message = license.encode()
@@ -27,9 +26,9 @@ class encrypto():
         return encrypted_message
 
     def decrypt(self, encrypted_message):
-        '''
-            Decrypt the license
-        '''
+    
+        #Decrypt the license
+    
         block = encrypto.load_key(self)
 
         f = Fernet(block)
