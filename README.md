@@ -27,3 +27,4 @@ A simple license asset management tool.
 ## TODO:
 
 - Delete all assets
+- Export database to CSV
