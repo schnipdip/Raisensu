@@ -7,7 +7,8 @@ A simple license asset management tool.
 
 # Get Started
 
-1. Build the database table `raisensu.py -t`
+1. Generate Encryption Key `python generate_key.py`
+1. Build the database table `python raisensu.py -t`
 
 # Examples
 
