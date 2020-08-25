@@ -32,3 +32,4 @@ A simple license asset management tool.
 - Delete all assets
 - Export database to CSV
 - Select NAME output
+- Add LICENSE expiration
