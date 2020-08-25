@@ -23,6 +23,7 @@ A simple license asset management tool.
 3. Import a list of assets from the import.csv file: `python raisensu.py -c`
 4. Update an asset: `python raisensu.py -u` - _follow the steps_
 5. View all assets in the database: `python raisensu.py -v`
+6. Export assets to a .csv file: `python raisensu.py -e [location]` -> default location is in C:\temp\
 
 # Output
 ![reisensu_img](https://funkyimg.com/i/373JH.png)
