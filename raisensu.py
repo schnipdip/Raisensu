@@ -80,12 +80,9 @@ def del_asset(usrInput):
 
 def update_asset():
     '''
-        TODO: Edit an asset within the database
         :Param updateIndex - select updates the index row
         :Param updateColumn - select updates the particular column field
         :Param setValue 
-
-        TODO: Having trouble updating table
     '''
 
     updateIndex = input("Which Index (ID) would you like to update? ")
@@ -95,12 +92,15 @@ def update_asset():
     conn = sqlite3.connect('asset_database.db')
 
     cursor = conn.cursor()
-    #cursor.execute("UPDATE ASSETS SET Name = 'TEST' WHERE ID = 1")
-    cursor.execute('''UPDATE ASSETS SET ? = '?' WHERE ID = ?''', (updateColumn, setValue, updateIndex))
-    #test = ('''UPDATE ASSETS SET ? = '?' WHERE ID = ?''', (updateColumn, setValue, updateIndex))
-    #print (test)
-    conn.commit()
     
+    try:
+        sql_update = "UPDATE ASSETS SET {0} = '{1}' WHERE ID = {2}".format(updateColumn, setValue, updateIndex)
+
+        cursor.execute(sql_update)
+    
+        conn.commit()
+    except Exception as e:
+        print (e)
     conn.close()
 
 def select_asset():
