@@ -2,8 +2,8 @@ import argparse
 import pandas as pd
 import sqlite3
 from asset import buildAsset, assignAsset
-
-def get_csv():
+from encryption import encrypto
+def get_csv(key_object):
     # imports csv file
     data = pd.read_csv('import.csv')
 
@@ -22,7 +22,7 @@ def get_csv():
         
         build, assign = create_asset(name, hostname, license, quantity)
         
-        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), quantity=build.get_quantity())
+        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), quantity=build.get_quantity(), key_object=key_object)
         
         counter += 1
 
@@ -48,37 +48,45 @@ def create_table():
     except:
         exit(1)
 
+def get_encrypt():
+    #create encrypt object
+    key_object = encrypto('secret.key')
+
+    return (key_object)
+
 def create_asset(name, hostname, license, quantity):
     build = buildAsset(name, license, quantity)
     assign = assignAsset(hostname)
 
     return (build, assign)
 
-def add_asset(name, hostname, license, quantity):
+def add_asset(name, hostname, license, quantity, key_object):
     conn = sqlite3.connect('asset_database.db')
 
     # Insert New Asset
     conn.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME)\
-                VALUES (?, ?, ?, ?)""",(name, license, quantity, hostname))
+                VALUES (?, ?, ?, ?)""",(name, key_object.encrypt(license), quantity, hostname))
     
     conn.commit()
 
     conn.close()
 
 def del_asset(usrInput):
+    
     conn = sqlite3.connect('asset_database.db')
 
     # Delete Asset
-    conn.execute('DELETE FROM ASSETS WHERE ID = ?', (usrInput))
+    conn.execute('DELETE FROM ASSETS WHERE ID = {0}'.format(usrInput))
 
     # Restart Index to next available ID
     conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS'")
-    
+        
     conn.commit()
 
     conn.close()
+   
 
-def update_asset():
+def update_asset(key_object):
     '''
         :Param updateIndex - select updates the index row
         :Param updateColumn - select updates the particular column field
@@ -86,7 +94,7 @@ def update_asset():
     '''
 
     updateIndex = input("Which Index (ID) would you like to update? ")
-    updateColumn = input("Which Column would you like to update? ")
+    updateColumn = input("Which Column would you like to update? ").upper()
     setValue = input("New Value? ")
 
     conn = sqlite3.connect('asset_database.db')
@@ -94,22 +102,29 @@ def update_asset():
     cursor = conn.cursor()
     
     try:
-        sql_update = "UPDATE ASSETS SET {0} = '{1}' WHERE ID = {2}".format(updateColumn, setValue, updateIndex)
+        #encrypt the license if they want to change it
+        if updateColumn == 'LICENSE':
+            setValue = key_object.encrypt(setValue)
+            setValue = setValue.decode()
 
-        cursor.execute(sql_update)
+            sql_update = "UPDATE ASSETS SET {0} = '{1}' WHERE ID = {2}".format(updateColumn, setValue, updateIndex)
+            cursor.execute(sql_update)
+        else:
+            sql_update = "UPDATE ASSETS SET {0} = '{1}' WHERE ID = {2}".format(updateColumn, setValue, updateIndex)
+            cursor.execute(sql_update)
     
         conn.commit()
     except Exception as e:
         print (e)
     conn.close()
 
-def select_asset():
+def select_asset(key_object):
     conn = sqlite3.connect('asset_database.db')
 
     cursor = conn.execute('SELECT * FROM ASSETS')
     
     for row in cursor:
-        print('ID:', row[0], ' Name:', row[1], ' License:', row[2], ' Quantity:', row[3], ' Hostname:', row[4])
+        print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4])
 
     conn.commit()
 
@@ -142,17 +157,21 @@ if __name__ == "__main__":
     view = result.view
     update = result.update
     
+
+    # configure encryption
+    key_object = get_encrypt()
+    
     if update is True:
-        select_asset()
-        update_asset()
+        select_asset(key_object)
+        update_asset(key_object)
     elif view is True:
-        select_asset()
+        select_asset(key_object)
     #check if database table has been set
     elif database is True:
         create_table()
     #check if spreadsheet has been set
     elif spreadsheet is True:
-        get_csv()
+        get_csv(key_object)
     #check if delete has been set
     elif delete is True:
         while delete is True:
@@ -160,7 +179,7 @@ if __name__ == "__main__":
             if name is not '':
                 usrInput = input('Enter the ID of the Asset to delete or return list (y): ')
                 if usrInput == 'y' or usrInput == 'Y':
-                    select_asset()
+                    select_asset(key_object)
                     pass
                 elif usrInput.isdigit():
                     #deletes user entry
@@ -172,4 +191,4 @@ if __name__ == "__main__":
     else:
         build, assign = create_asset(name, hostname, license, quantity)
         
-        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), quantity=build.get_quantity())
+        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), quantity=build.get_quantity(), key_object=key_object)

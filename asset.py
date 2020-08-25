@@ -9,6 +9,10 @@ class buildAsset:
         return(self.name)
 
     def get_license(self):
+        '''
+            TODO: Add encryption
+        '''
+        
         return (self.license)
 
     def get_quantity(self):
