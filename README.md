@@ -1,4 +1,4 @@
-![BuildStatus](https://img.shields.io/badge/Success-Working-brightgreen)
+![BuildStatus](https://img.shields.io/badge/build-success-brightgreen)
 
 ![reisensu_img](https://funkyimg.com/i/373GZ.png)
 
