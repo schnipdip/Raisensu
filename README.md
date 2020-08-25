@@ -21,5 +21,5 @@ A simple license asset management tool.
 5. View all assets in the database: `python raisensu.py -v`
 
 # Output
-![reisensu_img](https://funkyimg.com/i/373JD.png)
+![reisensu_img](https://funkyimg.com/i/373JH.png)
 
