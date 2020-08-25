@@ -23,3 +23,6 @@ A simple license asset management tool.
 # Output
 ![reisensu_img](https://funkyimg.com/i/373JH.png)
 
+## TODO:
+
+- Implement encryption to protect licenses
