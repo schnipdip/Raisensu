@@ -6,6 +6,9 @@ A simple license asset management tool.
 
 
 # Get Started
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d01dd77641f1470ba362255f9c7d7a58)](https://app.codacy.com/manual/cjh30/Raisensu?utm_source=github.com&utm_medium=referral&utm_content=schnipdip/Raisensu&utm_campaign=Badge_Grade_Dashboard)
+
 1. Install requirements `pip3 install requirements.txt`
 1. Generate Encryption Key `python generate_key.py`
 1. Build the database table `python raisensu.py -t`
