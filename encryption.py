@@ -33,7 +33,7 @@ class encrypto():
 
         f = Fernet(block)
         
-        if type(encrypted_message) == str:
+        if isinstance(encrypted_message, str):
             encrypted_message = encrypted_message.encode()
         
         decrypted_message = f.decrypt(encrypted_message)
