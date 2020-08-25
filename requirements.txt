@@ -1,5 +1,5 @@
 cryptography
 argparse
+pysqlite
 pandas
-sqlite3
 regex
