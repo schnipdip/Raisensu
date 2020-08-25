@@ -121,8 +121,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Asset Management Database')
     parser.add_argument('-c', action='store_true', dest='spreadsheet', help='Parse through import.csv file')
     parser.add_argument('-d', action='store_true', dest='delete', help='Delete Asset')
-    parser.add_argument('-s', action='store_true', dest='select_database', help='Create a New Table if it has not been created already')
-    parser.add_argument('-t', action='store_true', dest='database', help='View Database')
+    parser.add_argument('-t', action='store_true', dest='database', help='Create a New Table if it has not been created already')
     parser.add_argument('-v', action='store_true', dest='view', help='View all entries')
     parser.add_argument('-u', action='store_true', dest='update', help='Update an entry')
     parser.add_argument('-n', action='store', dest='name', type=str, help='Name of the License Product')
@@ -140,7 +139,6 @@ if __name__ == "__main__":
     delete = result.delete
     spreadsheet = result.spreadsheet
     database = result.database
-    select_database = result.select_database
     view = result.view
     update = result.update
     
@@ -148,8 +146,6 @@ if __name__ == "__main__":
         select_asset()
         update_asset()
     elif view is True:
-        select_asset()
-    elif select_database is True:
         select_asset()
     #check if database table has been set
     elif database is True:
