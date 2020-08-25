@@ -2,9 +2,8 @@ import os
 from cryptography.fernet import Fernet
 
 def generate_key():
-    '''
-    Generates a key and save it into a file
-    ''' 
+    
+    #Generates a key and save it into a file
     key = Fernet.generate_key()
 
     if os.stat('secret.key').st_size == 0:

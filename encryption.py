@@ -8,7 +8,7 @@ class encrypto():
         
     def load_key(self):
         
-        # open secret key
+        #open secret key
         return (open(self.key, 'rb').read())
 
     def encrypt(self, license):
