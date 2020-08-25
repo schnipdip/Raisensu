@@ -26,3 +26,4 @@ A simple license asset management tool.
 ## TODO:
 
 - Implement encryption to protect licenses
+- Delete all assets
