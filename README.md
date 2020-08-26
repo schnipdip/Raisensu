@@ -9,7 +9,7 @@ A simple license asset management tool.
 
 
 
-1. Install requirements `pip3 install requirements.txt`
+1. Install requirements `pip3 install -r requirements.txt`
 1. Generate Encryption Key `python generate_key.py`
 1. Build the database table `python raisensu.py -t`
 
