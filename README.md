@@ -14,7 +14,8 @@ A simple license asset management tool.
 1. Build the database table `python raisensu.py -t`
 
 # Possible Arguments
-```optional arguments:
+```
+optional arguments:
 
   -h, --help   show this help message and exit
   
