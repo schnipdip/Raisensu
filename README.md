@@ -13,10 +13,37 @@ A simple license asset management tool.
 1. Generate Encryption Key `python generate_key.py`
 1. Build the database table `python raisensu.py -t`
 
+# Possible Arguments
+```optional arguments:
+
+  -h, --help   show this help message and exit
+  
+  -c           Parse through import.csv file
+  
+  -d           Delete Asset
+  
+  -t           Create a New Table if it has not been created already
+  
+  -v           View all entries
+  
+  -u           Update an entry
+  
+  -n NAME      Name of the License Product
+  
+  -a HOSTNAME  Name of the hostname the license is attached to
+  
+  -l LICENSE   License data
+  
+  -q QUANTITY  Total Number of licenses
+  
+  -x EXPIRE    License expiration date
+  
+  -e EXPORT    Export SQL Database to CSV file
+```
 # Examples
 
 1. Getting help: `python raisensu.py -h`
-2. Adding a new asset from command-line: `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 10` (`-a` is optional to add a host)
+2. Adding a new asset from command-line: `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 10 -x 12/31/2021` (`-a` is optional to add a host)
 
 ![example1](https://funkyimg.com/i/373Jh.png)
 
