@@ -46,7 +46,8 @@ def get_csv(key_object):
         
         build, assign = create_asset(name, hostname, license, quantity, expire)
         
-        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
+        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), \
+                quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
         
         counter += 1
     
@@ -178,7 +179,7 @@ if __name__ == "__main__":
     parser.add_argument('-a', action='store', dest='hostname', type=str, help='Name of the hostname the license is attached to')
     parser.add_argument('-l', action='store', dest='license', type=str, help='License data')
     parser.add_argument('-q', action='store', dest='quantity', type=int, default=0, help='Total Number of licenses')
-    parser.add_argument('-x', action='store', dest='expire',default=0, help='License expiration date')
+    parser.add_argument('-x', action='store', dest='expire', default=0, help='License expiration date')
     parser.add_argument('-e', action='store', dest='export', type=str, help='Export SQL Database to CSV file')
 
     result = parser.parse_args()
@@ -229,4 +230,5 @@ if __name__ == "__main__":
     else:
         build, assign = create_asset(name, hostname, license, quantity, expire)
         
-        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
+        add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), \
+                quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
