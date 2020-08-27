@@ -72,6 +72,10 @@ optional arguments:
 2. (Linux) Set up a Linux CronJob for `raisensu_monitor.py`
 3. Edit the `monitor_settings.ini` file with the appropriate configuration information that fits your environment
 
+# Troubleshooting
+
+1. (Linux) If you are having trouble with `generate_key.py`, issue the following command: `dd if=/dev/urandom bs=32 count=1 2>/dev/null | openssl base64 > secret.key`
+
 ## TODO:
 
 - Select NAME output
