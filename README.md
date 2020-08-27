@@ -62,5 +62,4 @@ optional arguments:
 
 ## TODO:
 
-- Delete all assets
 - Select NAME output
