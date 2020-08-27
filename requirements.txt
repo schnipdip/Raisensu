@@ -3,3 +3,4 @@ argparse
 pysqlite
 pandas
 regex
+smtp
