@@ -31,6 +31,8 @@ optional arguments:
   
   -d           Delete Asset
   
+  --delete_all  Delete all records in table
+  
   -t           Create a New Table if it has not been created already
   
   -v           View all entries
