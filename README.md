@@ -4,6 +4,16 @@
 
 A simple license asset management tool.
 
+# Key Features
+
+Supports license encryption.
+
+Supports license expiration SMTP notifications.
+
+Supports license expiration logs.
+
+Supports license expiration monitoring service.
+
 
 # Get Started
 
