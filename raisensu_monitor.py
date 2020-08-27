@@ -58,7 +58,7 @@ def set_smtp(notify, config):
     receiver_email = config['email']['receiver_email']
     sender_email = config['email']['sender_email']
 
-    message = '''From: <{}}>
+    message = '''From: <{}>
     To: [{}]
     MIME-Version: 1.0
     Content-type: text/html
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     #smptp
     smtpState = get_smtp_state(config)
-
+    
     if smtpState == "TRUE":
         smtpObj = get_smtp(config)
         message = set_smtp(notify, config)
