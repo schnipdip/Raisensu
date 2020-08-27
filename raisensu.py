@@ -87,6 +87,19 @@ def del_asset(usrInput):
     conn.commit()
 
     conn.close()
+
+def del_all_asset():
+    conn = sqlite3.connect('asset_database.db')
+
+    #Delete Asset
+    conn.execute("DELETE FROM ASSETS")
+
+    #Restart Index to next available ID
+    conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS'")
+
+    conn.commit()
+
+    conn.close()
    
 def update_asset(key_object):
     '''
@@ -139,6 +152,9 @@ def select_asset(key_object):
 
     cursor = conn.execute('SELECT * FROM ASSETS')
     
+    #TODO: add the ability to decrypt only what your unique secret.key can decrypt. Display everything else as encrypted.
+    #for row in cursor:
+
     for row in cursor:
         print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
 
@@ -172,6 +188,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Asset Management Database')
     parser.add_argument('-c', action='store_true', dest='spreadsheet', help='Parse through import.csv file')
     parser.add_argument('-d', action='store_true', dest='delete', help='Delete Asset')
+    parser.add_argument('--delete_all', action='store_true', dest='deleteAll', help='Delete all records in table')
     parser.add_argument('-t', action='store_true', dest='database', help='Create a New Table if it has not been created already')
     parser.add_argument('-v', action='store_true', dest='view', help='View all entries')
     parser.add_argument('-u', action='store_true', dest='update', help='Update an entry')
@@ -195,6 +212,7 @@ if __name__ == "__main__":
     update = result.update
     export = result.export
     expire = result.expire
+    deleteAll = result.deleteAll
     
     #configure encryption
     key_object = get_encrypt()
@@ -225,6 +243,13 @@ if __name__ == "__main__":
                 else:
                     print('Invalid Entry, Must Be An Integer')
                     exit(1)
+    elif deleteAll is True:
+        accept = input('Confirm you want to delete all records (y): ')
+        accept = accept.lower()
+        if accept == 'y':
+            del_all_asset()
+        else:
+            exit(0)
     elif export:
         export_asset(export, key_object)
     else:
