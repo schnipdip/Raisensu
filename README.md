@@ -64,4 +64,3 @@ optional arguments:
 
 - Delete all assets
 - Select NAME output
-- Monitor LICENSE expiration and send notifaction
