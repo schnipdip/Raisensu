@@ -1,4 +1,5 @@
 cryptography
+configparser
 argparse
 pysqlite
 pandas
