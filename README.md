@@ -7,8 +7,6 @@ A simple license asset management tool.
 
 # Get Started
 
-
-
 1. Install requirements `pip3 install -r requirements.txt`
 1. Generate Encryption Key `python generate_key.py`
 1. Build the database table `python raisensu.py -t`
@@ -55,6 +53,12 @@ optional arguments:
 
 # Output
 ![reisensu_img](https://funkyimg.com/i/373JH.png)
+
+# Configure Monitoring (optional)
+
+1. (Windows) Set up a Task Schedule for `raisensu_monitor.py`
+2. (Linux) Set up a Linux CronJob for `raisensu_monitor.py`
+3. Edit the `monitor_settings.ini` file with the appropriate configuration information that fits your environment
 
 ## TODO:
 
