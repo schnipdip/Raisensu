@@ -1,4 +1,4 @@
-![BuildStatus](https://img.shields.io/badge/build-success-brightgreen)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d01dd77641f1470ba362255f9c7d7a58)](https://app.codacy.com/manual/cjh30/Raisensu?utm_source=github.com&utm_medium=referral&utm_content=schnipdip/Raisensu&utm_campaign=Badge_Grade_Dashboard)
+![BuildStatus](https://img.shields.io/badge/build-success-brightgreen)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d01dd77641f1470ba362255f9c7d7a58)](https://app.codacy.com/manual/cjh30/Raisensu?utm_source=github.com&utm_medium=referral&utm_content=schnipdip/Raisensu&utm_campaign=Badge_Grade_Dashboard) [![Known Vulnerabilities](https://snyk.io/test/github/schnipdip/Raisensu/badge.svg)](https://snyk.io/test/github/schnipdip/Raisensu)
 
 ![reisensu_img](https://funkyimg.com/i/373GZ.png)
 
