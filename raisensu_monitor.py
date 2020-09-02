@@ -149,6 +149,9 @@ if __name__ == "__main__":
     
     for note in notify:
         if smtpState == "TRUE":
-            smtpObj = get_smtp(config)
-            message = set_smtp(note, config)
-            send_smtp(smtpObj, message, config)
+            try:
+                smtpObj = get_smtp(config)
+                message = set_smtp(note, config)
+                send_smtp(smtpObj, message, config)
+            except Exception as e:
+                print(e)
