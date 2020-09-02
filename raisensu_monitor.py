@@ -5,6 +5,8 @@ import sqlite3
 import logging
 import smtplib
 
+import time
+
 def get_parser():
     config = configparser.ConfigParser()
 
@@ -115,18 +117,21 @@ def get_sql_statement(config, key_object, logger):
         '''
         day_diff = diff_dates(date_today, row[3])
 
-        if day_diff == notify_1:
-            logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3]))
+        try:
+            if day_diff == notify_1:
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3]))
 
-            return ('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3]))
-        elif day_diff == notify_2:
-            logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3]))
-            
-            return ('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3]))
-        elif day_diff == notify_3:
-            logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3]))               
-            
-            return ('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3]))
+            elif day_diff == notify_2:
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3]))
+                
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3]))
+            elif day_diff == notify_3:
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3]))               
+                
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3]))
+        except Exception as e:
+            print (e)
 
 if __name__ == "__main__":
     #logger
@@ -144,9 +149,9 @@ if __name__ == "__main__":
     #smptp
     smtpState = get_smtp_state(config)
     
-    if smtpState == "TRUE":
-        smtpObj = get_smtp(config)
-        message = set_smtp(notify, config)
-        send_smtp(smtpObj, message, config)
-
-
+    for note in notify:
+        counter +=1 
+        if smtpState == "TRUE":
+            smtpObj = get_smtp(config)
+            message = set_smtp(note, config)
+            send_smtp(smtpObj, message, config)
