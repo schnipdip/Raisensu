@@ -5,8 +5,6 @@ import sqlite3
 import logging
 import smtplib
 
-import time
-
 def get_parser():
     config = configparser.ConfigParser()
 
@@ -150,7 +148,6 @@ if __name__ == "__main__":
     smtpState = get_smtp_state(config)
     
     for note in notify:
-        counter +=1 
         if smtpState == "TRUE":
             smtpObj = get_smtp(config)
             message = set_smtp(note, config)
