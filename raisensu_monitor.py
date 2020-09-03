@@ -1,4 +1,5 @@
 from encryption import encrypto
+from time import sleep
 import configparser
 import datetime
 import sqlite3
@@ -47,24 +48,24 @@ def get_smtp(config):
     config.read('monitor_settings.ini')
 
     smtpServer = config['email']['smtp_server']
-    smtpObj = smtplib.SMTP(smtpServer)
+    smtpPort = config['email']['smtp_port']
+    smtpObj = smtplib.SMTP(smtpServer, smtpPort)
 
     return smtpObj
 
 def set_smtp(notify, config):
+    from email.mime.text import MIMEText
+    
     #read in monitor_settings file for SMTP objects
     config.read('monitor_settings.ini')
 
     receiver_email = config['email']['receiver_email']
     sender_email = config['email']['sender_email']
 
-    message = '''From: <{}>
-    To: [{}]
-    MIME-Version: 1.0
-    Content-type: text/html
-    Subject: [ALERT] Raisensu License Asset Monitoring
-    {}
-    '''.format(sender_email, receiver_email, notify)
+    message = MIMEText('Here is the list of licenses that are about to expire:\n{}'.format(notify))
+    message['Subject'] = '[ALERT] Raisensu License Asset Monitoring'
+    message['From'] = sender_email
+    message['To'] = receiver_email
 
     return message
 
@@ -74,10 +75,25 @@ def send_smtp(smtpObj, message, config):
 
     receiver_email = config['email']['receiver_email']
     sender_email = config['email']['sender_email']
+    smtp_username = config['email']['smtp_username']
+    smtp_password = config['email']['smtp_password']
 
-    smtpObj.sendmail(sender_email, receiver_email, message)
+    try:
+        #identify prompting server for supported features
+        smtpObj.ehlo()
+        
+        #start tls connection if server supports tls
+        if smtpObj.has_extn('STARTTLS'):
+            smtpObj.starttls()
+            smtpObj.ehlo()
 
-    
+        smtpObj.login(smtp_username, smtp_password)
+        smtpObj.sendmail(sender_email, receiver_email, message.as_string())
+    except Exception as e:
+        print (e)
+    finally:
+        smtpObj.quit()
+
 def diff_dates(date_today, comp_date):
     #convert comp_date to date object
     date_time_today = datetime.datetime.strptime(date_today, '%m/%d/%Y')
@@ -85,7 +101,6 @@ def diff_dates(date_today, comp_date):
 
     #return remaining days
     return abs(date_time_comp - date_time_today).days
-
 
 def get_sql_statement(config, key_object, logger):
     #Read in monitor_settings.ini
@@ -147,11 +162,20 @@ if __name__ == "__main__":
     #smptp
     smtpState = get_smtp_state(config)
     
-    for note in notify:
-        if smtpState == "TRUE":
-            try:
-                smtpObj = get_smtp(config)
-                message = set_smtp(note, config)
-                send_smtp(smtpObj, message, config)
-            except Exception as e:
-                print(e)
+    bundle_message = []
+
+    if smtpState == "TRUE":
+        for note in notify:
+            bundle_message.append(note)
+
+        #convert list to string for formatting
+        pretty_bundle = ' '.join([str('\n' + item + '\n') for item in bundle_message])
+
+        try:
+            smtpObj = get_smtp(config)
+            message = set_smtp(pretty_bundle, config)
+
+            send_smtp(smtpObj, message, config)
+            sleep(1)
+        except Exception as e:
+            print(e)
