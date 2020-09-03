@@ -133,17 +133,17 @@ def get_sql_statement(config, key_object, logger):
 
         try:
             if day_diff == notify_1:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3], row[4]))
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3], row[4]))
 
-                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3], row[4]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3], row[4]))
             elif day_diff == notify_2:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
                 
-                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
             elif day_diff == notify_3:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))               
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))               
                 
-                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))
         except Exception as e:
             print (e)
 
