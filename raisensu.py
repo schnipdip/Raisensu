@@ -1,33 +1,125 @@
-import argparse
-import pandas as pd
-import sqlite3
-import re
 from asset import buildAsset, assignAsset
 from encryption import encrypto
+import pandas as pd
+import argparse
+import psycopg2
+import sqlite3
+import re
+from time import sleep
+
+def get_configParser():
+    import configparser
+
+    config = configparser.ConfigParser()
+    config.read('database_settings.ini')
+
+    return config
+
+def get_databaseType():
+    #get configparser
+    config = get_configParser()
+
+    #get database type
+    databaseType = config['database_type']['type']
+
+    return databaseType
+
+def connect_sqlite():
+    #get configparser
+    config = get_configParser()
+
+    databaseType = get_databaseType()
+
+    sqliteDatabase = config['database_sqlite']['sqlite_database']
+
+    conn = sqlite3.connect(sqliteDatabase)
+    cursor = conn.cursor()
+
+    return conn, cursor
+
+def connect_postgres():
+    #get configparser
+    config = get_configParser()
+
+    databaseType = get_databaseType()
+
+    #import configuration information to connect to remote postrgre database
+    postgresServer   = config['database_postgres']['postgres_server']
+    postgrestPort    = config['database_postgres']['postgres_port']
+    postgresDatabase = config['database_postgres']['postgres_database']
+    postgresUsername = config['database_postgres']['postgres_username']
+    postgresPassword = config['database_postgres']['postgres_password']
+
+    conn = psycopg2.connect(host=postgresServer,
+                            database=postgresDatabase,
+                            port=postgrestPort,
+                            user=postgresUsername,
+                            password=postgresPassword)
+    cursor = conn.cursor()
+
+    conn.commit()
+
+    return conn, cursor 
+
+def decide_databaseType():
+    #get database type
+    databaseType = get_databaseType()
+
+    if databaseType == 'sqlite':
+        conn, cursor = connect_sqlite()
+    elif databaseType == 'postgres':
+        conn, cursor = connect_postgres()
+    else:
+        print('Unsupported Database Type.')
+        exit(0)
+    
+    return conn, cursor
 
 def create_table():
+    #get configparser
+    config = get_configParser()
+
+    conn, cursor = decide_databaseType()    
+
+    #get database type
+    databaseType = get_databaseType()
+
     try:
-        conn = sqlite3.connect('asset_database.db')
-        cursor = conn.cursor()
+        if databaseType == 'sqlite':
+            sql_create_asset_table = ('''CREATE TABLE IF NOT EXISTS ASSETS (
+            ID        INTEGER       PRIMARY KEY AUTOINCREMENT,
+            NAME      VARCHAR(255)  NOT NULL,
+            LICENSE   VARCHAR(255)  NOT NULL,
+            QUANTITY  INT           NOT NULL,
+            HOSTNAME  VARCHAR(255)  NOT NULL,
+            EXPIRES   VARCHAR(255)  NOT NULL);''')
 
-        sql_create_asset_table = ('''CREATE TABLE IF NOT EXISTS ASSETS (
-        ID        INTEGER       PRIMARY KEY AUTOINCREMENT,
-        NAME      VARCHAR(255)  NOT NULL,
-        LICENSE   VARCHAR(255)  NOT NULL,
-        QUANTITY  INT           NOT NULL,
-        HOSTNAME  VARCHAR(255)  NOT NULL,
-        EXPIRES   VARCHAR(255)  NOT NULL);''')
+            cursor.execute(sql_create_asset_table)
+            
+            #Commit Changes to Database
+            conn.commit()
 
-        cursor.execute(sql_create_asset_table)
-        
-        #Commit Changes to Database
-        conn.commit()
+            #Close Database Connection
+            conn.close()
+        elif databaseType == 'postgres':
+            sql_create_asset_table = ('''CREATE TABLE IF NOT EXISTS ASSETS (
+            ID        SERIAL        PRIMARY KEY,
+            NAME      VARCHAR(255)  NOT NULL,
+            LICENSE   VARCHAR(255)  NOT NULL,
+            QUANTITY  INT           NOT NULL,
+            HOSTNAME  VARCHAR(255)  NOT NULL,
+            EXPIRES   VARCHAR(255)  NOT NULL);''')
 
-        #Close Database Connection
-        conn.close()
+            cursor.execute(sql_create_asset_table)
+            
+            #Commit Changes to Database
+            conn.commit()
+
+            #Close Database Connection
+            conn.close()
     except Exception as e:
         print(e)
-        exit(1)
+        exit(0)
 
 def get_csv(key_object):
     #imports csv file
@@ -64,42 +156,85 @@ def create_asset(name, hostname, license, quantity, expire):
     return (build, assign)
 
 def add_asset(name, hostname, license, quantity, expire, key_object):
-    conn = sqlite3.connect('asset_database.db')
+    #conn = sqlite3.connect('asset_database.db')
+    conn, cursor = decide_databaseType()
 
-    #Insert New Asset
-    conn.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
-                VALUES (?, ?, ?, ?, ?)""",(name, key_object.encrypt(license), quantity, hostname, expire))
-    
-    conn.commit()
+    #get database type
+    databaseType = get_databaseType()
 
-    conn.close()
+    if databaseType == 'sqlite':
+        #Insert New Asset
+        conn.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
+                    VALUES (?, ?, ?, ?, ?)""",(name, key_object.encrypt(license), quantity, hostname, expire))
+        
+        conn.commit()
+
+        conn.close()
+    elif databaseType == 'postgres':
+        #Insert New Asset
+        cursor.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
+                    VALUES (%s, %s, %s, %s, %s)""",(name, key_object.encrypt(license), quantity, hostname, expire))
+        
+        conn.commit()
+
+        conn.close()
 
 def del_asset(usrInput):
-    
-    conn = sqlite3.connect('asset_database.db')
+    #conn = sqlite3.connect('asset_database.db')
+    conn, cursor = decide_databaseType()
 
-    #Delete Asset
-    conn.execute("DELETE FROM ASSETS WHERE ID = {0}".format(usrInput))
+    #get database type
+    databaseType = get_databaseType()
 
-    #Restart Index to next available ID
-    conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS'")
-        
-    conn.commit()
+    if databaseType == 'sqlite':
+        #Delete Asset
+        conn.execute("DELETE FROM ASSETS WHERE ID = {0};".format(usrInput))
 
-    conn.close()
+        #Restart Index to next available ID
+        conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS';")
+            
+        conn.commit()
+
+        conn.close()
+    elif databaseType == 'postgres':
+        #Delete Asset
+        print (usrInput)
+        cursor.execute("DELETE FROM ASSETS WHERE ID = %s;",(usrInput))
+
+        #Restart Index to next available ID
+        cursor.execute("SELECT setval('assets_id_seq', max(ID)) FROM ASSETS;")
+            
+        conn.commit()
+
+        conn.close()
 
 def del_all_asset():
-    conn = sqlite3.connect('asset_database.db')
+    #conn = sqlite3.connect('asset_database.db')
+    conn, cursor = decide_databaseType()
 
-    #Delete Asset
-    conn.execute("DELETE FROM ASSETS")
+    #get database type
+    databaseType = get_databaseType()
 
-    #Restart Index to next available ID
-    conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS'")
+    if databaseType == 'sqlite':
+        #Delete Asset
+        conn.execute("DELETE FROM ASSETS;")
 
-    conn.commit()
+        #Restart Index to next available ID
+        conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS';")
 
-    conn.close()
+        conn.commit()
+
+        conn.close()
+    elif databaseType == 'postgres':
+        #Delete Asset
+        cursor.execute("DELETE FROM ASSETS;")
+
+        #Restart Index to next available ID
+        cursor.execute("ALTER SEQUENCE assets_id_seq RESTART;")
+
+        conn.commit()
+
+        conn.close()
    
 def update_asset(key_object):
     '''
@@ -107,11 +242,14 @@ def update_asset(key_object):
         :Param updateColumn - select updates the particular column field
         :Param setValue 
     '''
+    #TODO: Integrate POSTGRE support
+
     updateIndex = input("Which Index (ID) would you like to update? ")
     updateColumn = input("Which Column would you like to update? ").upper()
     setValue = input("New Value? ")
 
-    conn = sqlite3.connect('asset_database.db')
+    #conn = sqlite3.connect('asset_database.db')
+    conn, cursor = decide_databaseType()
 
     cursor = conn.cursor()
     
@@ -136,7 +274,7 @@ def update_asset(key_object):
 
             else:
                 print('Invalid date format. mm/dd/yyyy')
-                exit(1)
+                exit(0)
         else:
             sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?".format(updateColumn)
             cursor.execute(sql_update, [setValue, updateIndex])
@@ -148,14 +286,15 @@ def update_asset(key_object):
     conn.close()
 
 def select_asset(key_object):
-    conn = sqlite3.connect('asset_database.db')
+    #conn = sqlite3.connect('asset_database.db')
+    conn, cursor = decide_databaseType()
 
-    cursor = conn.execute('SELECT * FROM ASSETS')
+    selectAll = conn.execute('SELECT * FROM ASSETS')
     
     #TODO: add the ability to decrypt only what your unique secret.key can decrypt. Display everything else as encrypted.
     #for row in cursor:
 
-    for row in cursor:
+    for row in selectAll:
         print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
 
     conn.commit()
@@ -164,22 +303,47 @@ def select_asset(key_object):
 
 def export_asset(export, key_object):
     import csv
+    
     try:
-        conn = sqlite3.connect('asset_database.db')
+        #conn = sqlite3.connect('asset_database.db')
+        conn, cursor = decide_databaseType()
 
-        cursor = conn.execute('SELECT * FROM ASSETS')
+        #get database type
+        databaseType = get_databaseType()
 
-        #open/create export .csv file
-        file = open(export,'a+')
+        if databaseType == 'sqlite':
+            selectAll = conn.execute('SELECT * FROM ASSETS;')
 
-        #write column headers
-        file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
+            #open/create export .csv file
+            file = open(export,'a+')
 
-        #write database data to .csv
-        for row in cursor:
-            file.write('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(row[0], row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
+            #write column headers
+            file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
+
+            #write database data to .csv
+            for row in selectAll:    
+                file.write('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
+            
+            file.close()
+        elif databaseType == 'postgres':
+            cursor.execute('SELECT * FROM ASSETS;')
+
+            #open/create export .csv file
+            file = open(export,'a+')
+
+            #write column headers
+            file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
+
+            selectAll = cursor.fetchall()
+
+            for row in selectAll:
+                print (row)
+                write = ('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
+                print(write)
+                file.write(write)            
+
+            file.close()
         
-        file.close()
     except Exception as e:
         print(e)
         
