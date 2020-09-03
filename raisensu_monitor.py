@@ -108,7 +108,7 @@ def get_sql_statement(config, key_object, logger):
 
     conn = sqlite3.connect('asset_database.db')
 
-    cursor = conn.execute('SELECT ID, NAME, LICENSE, EXPIRES FROM ASSETS')
+    cursor = conn.execute('SELECT ID, NAME, LICENSE, EXPIRES, HOSTNAME FROM ASSETS')
 
     #get todays date
     today = datetime.date.today()
@@ -127,22 +127,23 @@ def get_sql_statement(config, key_object, logger):
             row[1] return type: str -> NAME
             row[2] return type: str -> LICENSE
             row[3] return type: str -> EXPIRES
+            row[4] return type: str -> HOSTNAME
         '''
         day_diff = diff_dates(date_today, row[3])
 
         try:
             if day_diff == notify_1:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3]))
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3], row[4]))
 
-                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_1, row[1], key_object.decrypt(row[2]), row[3], row[4]))
             elif day_diff == notify_2:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3]))
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
                 
-                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
             elif day_diff == notify_3:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3]))               
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))               
                 
-                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} AND EXPIRES {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3]))
+                yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE. EXPIRES {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))
         except Exception as e:
             print (e)
 
