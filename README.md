@@ -80,3 +80,4 @@ optional arguments:
 
 - Select NAME output
 - Support Remote Database
+- Query and return Hostname
