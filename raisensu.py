@@ -103,12 +103,12 @@ def create_table():
             conn.close()
         elif databaseType == 'postgres':
             sql_create_asset_table = ('''CREATE TABLE IF NOT EXISTS ASSETS (
-            ID        SERIAL        PRIMARY KEY,
-            NAME      VARCHAR(255)  NOT NULL,
-            LICENSE   VARCHAR(255)  NOT NULL,
-            QUANTITY  INT           NOT NULL,
-            HOSTNAME  VARCHAR(255)  NOT NULL,
-            EXPIRES   VARCHAR(255)  NOT NULL);''')
+            ID        SERIAL PRIMARY KEY,
+            NAME      TEXT  NOT NULL,
+            LICENSE   TEXT  NOT NULL,
+            QUANTITY  INT   NOT NULL,
+            HOSTNAME  TEXT  NOT NULL,
+            EXPIRES   TEXT  NOT NULL);''')
 
             cursor.execute(sql_create_asset_table)
             
@@ -171,9 +171,15 @@ def add_asset(name, hostname, license, quantity, expire, key_object):
 
         conn.close()
     elif databaseType == 'postgres':
+        #encrypt the license
+        encrypt_license = key_object.encrypt(license)
+
+        #convert the byte code to str
+        encrypt_license = encrypt_license.decode('utf-8')
+
         #Insert New Asset
         cursor.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
-                    VALUES (%s, %s, %s, %s, %s)""",(name, key_object.encrypt(license), quantity, hostname, expire))
+                    VALUES (%s, %s, %s, %s, %s)""",(name, encrypt_license, quantity, hostname, expire))
         
         conn.commit()
 
@@ -192,7 +198,7 @@ def del_asset(usrInput):
 
         #Restart Index to next available ID
         conn.execute("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'ASSETS';")
-            
+
         conn.commit()
 
         conn.close()
@@ -203,7 +209,7 @@ def del_asset(usrInput):
 
         #Restart Index to next available ID
         cursor.execute("SELECT setval('assets_id_seq', max(ID)) FROM ASSETS;")
-            
+
         conn.commit()
 
         conn.close()
@@ -259,7 +265,7 @@ def update_asset(key_object):
         #encrypt the license if they want to change it
         if updateColumn not in columns:
             raise Exception ("Attempt to update unknown column: {0}".format(updateColumn))
-        
+
         elif updateColumn == 'LICENSE':
             setValue = key_object.encrypt(setValue)
             setValue = setValue.decode()
@@ -289,14 +295,27 @@ def select_asset(key_object):
     #conn = sqlite3.connect('asset_database.db')
     conn, cursor = decide_databaseType()
 
-    selectAll = conn.execute('SELECT * FROM ASSETS')
+    #get database type
+    databaseType = get_databaseType()
+
+    if databaseType == 'sqlite':
+        selectAll = conn.execute('SELECT * FROM ASSETS')
+        for row in selectAll:
+            print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
+
+    elif databaseType == 'postgres':
+        cursor.execute('SELECT * FROM ASSETS')
+
+        selectAll = cursor.fetchall()
+
+        for row in selectAll:
+            print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
+
     
     #TODO: add the ability to decrypt only what your unique secret.key can decrypt. Display everything else as encrypted.
     #for row in cursor:
 
-    for row in selectAll:
-        print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
-
+    
     conn.commit()
 
     conn.close()
