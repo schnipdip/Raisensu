@@ -1,7 +1,7 @@
 cryptography
 configparser
 argparse
-pysqlite
+pysqlite3
 pandas
 regex
 smtp
