@@ -72,7 +72,7 @@ def decide_databaseType():
     else:
         print('Unsupported Database Type.')
         exit(0)
-    
+
     return conn, cursor
 
 def create_table():
@@ -95,7 +95,7 @@ def create_table():
             EXPIRES   VARCHAR(255)  NOT NULL);''')
 
             cursor.execute(sql_create_asset_table)
-            
+
             #Commit Changes to Database
             conn.commit()
 
@@ -111,7 +111,7 @@ def create_table():
             EXPIRES   TEXT  NOT NULL);''')
 
             cursor.execute(sql_create_asset_table)
-            
+
             #Commit Changes to Database
             conn.commit()
 
@@ -135,14 +135,14 @@ def get_csv(key_object):
         hostname = df.loc[counter, 'hostname']
         quantity = df.loc[counter, 'quantity']
         expire = df.loc[counter, 'expires']
-        
+
         build, assign = create_asset(name, hostname, license, quantity, expire)
-        
+
         add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), \
                 quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
-        
+
         counter += 1
-    
+
 def get_encrypt():
     #create encrypt object
     key_object = encrypto('secret.key')
@@ -180,7 +180,7 @@ def add_asset(name, hostname, license, quantity, expire, key_object):
         #Insert New Asset
         cursor.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
                     VALUES (%s, %s, %s, %s, %s)""",(name, encrypt_license, quantity, hostname, expire))
-        
+
         conn.commit()
 
         conn.close()
@@ -204,7 +204,6 @@ def del_asset(usrInput):
         conn.close()
     elif databaseType == 'postgres':
         #Delete Asset
-        print (usrInput)
         cursor.execute("DELETE FROM ASSETS WHERE ID = %s;",(usrInput))
 
         #Restart Index to next available ID
@@ -241,14 +240,13 @@ def del_all_asset():
         conn.commit()
 
         conn.close()
-   
+
 def update_asset(key_object):
     '''
         :Param updateIndex - select updates the index row
         :Param updateColumn - select updates the particular column field
-        :Param setValue 
+        :Param setValue - set the new value
     '''
-    #TODO: Integrate POSTGRE support
 
     updateIndex = input("Which Index (ID) would you like to update? ")
     updateColumn = input("Which Column would you like to update? ").upper()
@@ -258,37 +256,59 @@ def update_asset(key_object):
     conn, cursor = decide_databaseType()
 
     cursor = conn.cursor()
-    
+
+    #get database type
+    databaseType = get_databaseType()
+
     columns = ["ID","NAME","LICENSE","QUANTITY", "HOSTNAME", "EXPIRES"]
 
     try:
         #encrypt the license if they want to change it
         if updateColumn not in columns:
-            raise Exception ("Attempt to update unknown column: {0}".format(updateColumn))
+            raise Exception ("Attempted to update unknown column: {0}".format(updateColumn))
+            exit(0)
 
         elif updateColumn == 'LICENSE':
+            #encrypt updated value
             setValue = key_object.encrypt(setValue)
             setValue = setValue.decode()
+            print(setValue)
+            print(type(setValue))
 
-            sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?".format(updateColumn)
-            cursor.execute(sql_update, [setValue, updateIndex])
-
-        elif updateColumn == 'EXPIRES':
-            if re.search((r"[\d]{1,2}/[\d]{1,2}/[\d]{2}"), setValue):
-                sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?".format(updateColumn)
+            if databaseType == 'sqlite':
+                sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?;".format(updateColumn)
                 cursor.execute(sql_update, [setValue, updateIndex])
 
+            elif databaseType == 'postgres':
+                sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
+                cursor.execute(sql_update, [setValue, updateIndex])
+
+    
+        elif updateColumn == 'EXPIRES':
+            if re.search((r"[\d]{1,2}/[\d]{1,2}/[\d]{2}"), setValue):
+                if databaseType == 'sqlite':
+                    sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?;".format(updateColumn)
+                    cursor.execute(sql_update, [setValue, updateIndex])
+
+                elif databaseType == 'postgres':
+                    sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
+                    cursor.execute(sql_update, [setValue, updateIndex])
             else:
                 print('Invalid date format. mm/dd/yyyy')
                 exit(0)
         else:
-            sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?".format(updateColumn)
-            cursor.execute(sql_update, [setValue, updateIndex])
-    
-        conn.commit()
+            if databaseType == 'sqlite':
+                sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?;".format(updateColumn)
+                cursor.execute(sql_update, [setValue, updateIndex])
+
+            elif databaseType == 'postgres':
+                sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
+                cursor.execute(sql_update, [setValue, updateIndex])    
     except Exception as e:
         print(e)
 
+    conn.commit()
+   
     conn.close()
 
 def select_asset(key_object):
@@ -299,30 +319,29 @@ def select_asset(key_object):
     databaseType = get_databaseType()
 
     if databaseType == 'sqlite':
-        selectAll = conn.execute('SELECT * FROM ASSETS')
+        selectAll = conn.execute('SELECT * FROM ASSETS ORDER BY ID')
         for row in selectAll:
             print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
 
     elif databaseType == 'postgres':
-        cursor.execute('SELECT * FROM ASSETS')
+        cursor.execute('SELECT * FROM ASSETS ORDER BY ID')
 
         selectAll = cursor.fetchall()
 
         for row in selectAll:
             print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
 
-    
+
     #TODO: add the ability to decrypt only what your unique secret.key can decrypt. Display everything else as encrypted.
     #for row in cursor:
 
-    
     conn.commit()
 
     conn.close()
 
 def export_asset(export, key_object):
     import csv
-    
+
     try:
         #conn = sqlite3.connect('asset_database.db')
         conn, cursor = decide_databaseType()
@@ -342,7 +361,7 @@ def export_asset(export, key_object):
             #write database data to .csv
             for row in selectAll:    
                 file.write('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
-            
+
             file.close()
         elif databaseType == 'postgres':
             cursor.execute('SELECT * FROM ASSETS;')
@@ -354,18 +373,18 @@ def export_asset(export, key_object):
             file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
 
             selectAll = cursor.fetchall()
-
+            
             for row in selectAll:
-                print (row)
-                write = ('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
-                print(write)
-                file.write(write)            
+                write = (row[0], row[1], key_object.decrypt(row[2]), row[3], row[4], row[5])
+
+                file.write(str(write).replace('(', '').replace(')',''))
+                file.write('\n')  
 
             file.close()
-        
+
     except Exception as e:
         print(e)
-        
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Asset Management Database')
@@ -396,10 +415,10 @@ if __name__ == "__main__":
     export = result.export
     expire = result.expire
     deleteAll = result.deleteAll
-    
+
     #configure encryption
     key_object = get_encrypt()
-    
+
     if update is True:
         select_asset(key_object)
         update_asset(key_object)
