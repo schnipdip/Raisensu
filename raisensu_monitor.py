@@ -76,9 +76,6 @@ def set_logger(logger):
     logger.addHandler(file_handler)
 
 def get_databaseType():
-    #get configparser
-    config = get_configParser()
-
     #get database type
     databaseType = config['database_type']['type']
 
