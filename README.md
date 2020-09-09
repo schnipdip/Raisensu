@@ -15,6 +15,8 @@ Supports license expiration logs.
 
 Supports license expiration monitoring service.
 
+Supports Sqlite3 and Postgres.
+
 
 # Get Started
 
