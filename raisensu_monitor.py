@@ -33,8 +33,6 @@ def connect_postgres():
     #get configparser
     config = get_configParser()
 
-    databaseType = get_databaseType()
-
     #import configuration information to connect to remote postrgre database
     postgresServer   = config['database_postgres']['postgres_server']
     postgrestPort    = config['database_postgres']['postgres_port']

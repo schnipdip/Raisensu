@@ -5,7 +5,6 @@ import argparse
 import psycopg2
 import sqlite3
 import re
-from time import sleep
 
 def get_configParser():
     import configparser
@@ -27,8 +26,6 @@ def get_databaseType():
 def connect_sqlite():
     #get configparser
     config = get_configParser()
-
-    databaseType = get_databaseType()
 
     sqliteDatabase = config['database_sqlite']['sqlite_database']
 
@@ -76,9 +73,6 @@ def decide_databaseType():
     return conn, cursor
 
 def create_table():
-    #get configparser
-    config = get_configParser()
-
     conn, cursor = decide_databaseType()
 
     #get database type
@@ -266,14 +260,11 @@ def update_asset(key_object):
         #encrypt the license if they want to change it
         if updateColumn not in columns:
             raise Exception ("Attempted to update unknown column: {0}".format(updateColumn))
-            exit(0)
 
         elif updateColumn == 'LICENSE':
             #encrypt updated value
             setValue = key_object.encrypt(setValue)
             setValue = setValue.decode()
-            print(setValue)
-            print(type(setValue))
 
             if databaseType == 'sqlite':
                 sql_update = "UPDATE ASSETS SET {0} = ? WHERE ID = ?;".format(updateColumn)
