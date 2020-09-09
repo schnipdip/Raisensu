@@ -51,7 +51,7 @@ def connect_postgres():
 
     conn.commit()
 
-    return conn, cursor 
+    return conn, cursor
 
 def get_encrypt():
     #create encrypt object
@@ -62,7 +62,7 @@ def get_encrypt():
 def get_logger():
     #creates logger object
     logger = logging.getLogger(__name__)
-    
+
     return logger
 
 def set_logger(logger):
@@ -80,7 +80,7 @@ def set_logger(logger):
 def get_databaseType():
     #get configparser
     config = get_configParser()
-    
+
     #get database type
     databaseType = config['database_type']['type']
 
@@ -103,7 +103,7 @@ def decide_databaseType():
 def get_smtp_state(config):
     smtpState = config['email']['enable_email'].upper()
 
-    return smtpState        
+    return smtpState
 
 def get_smtp(config):
     smtpServer = config['email']['smtp_server']
@@ -137,7 +137,7 @@ def send_smtp(smtpObj, message, config):
     try:
         #identify prompting server for supported features
         smtpObj.ehlo()
-        
+
         #start tls connection if server supports tls
         if smtpObj.has_extn('STARTTLS'):
             smtpObj.starttls()
@@ -208,13 +208,13 @@ def get_sql_statement(config, key_object, logger):
 
                 yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_2, row[1], key_object.decrypt(row[2]), row[3], row[4]))
             elif day_diff == notify_3:
-                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))               
+                logger.info('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))
                 state_store.append(row)
 
                 yield('WARNING {} DAYS FOR THE ASSET {} WITH THE LICENSE {} TO EXPIRE {} ON THE HOST {}'.format(notify_3, row[1], key_object.decrypt(row[2]), row[3], row[4]))
         except Exception as e:
             print (e)
-    
+
     #exit program safely if no licenses are to be returned.
     if not state_store:
         logger.info('No license expirations found.')
@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
     #smptp
     smtpState = get_smtp_state(config)
-    
+
     bundle_message = []
 
     if smtpState == "TRUE":

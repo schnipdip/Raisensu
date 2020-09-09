@@ -59,7 +59,7 @@ def connect_postgres():
 
     conn.commit()
 
-    return conn, cursor 
+    return conn, cursor
 
 def decide_databaseType():
     #get database type
@@ -79,7 +79,7 @@ def create_table():
     #get configparser
     config = get_configParser()
 
-    conn, cursor = decide_databaseType()    
+    conn, cursor = decide_databaseType()
 
     #get database type
     databaseType = get_databaseType()
@@ -166,7 +166,7 @@ def add_asset(name, hostname, license, quantity, expire, key_object):
         #Insert New Asset
         conn.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
                     VALUES (?, ?, ?, ?, ?)""",(name, key_object.encrypt(license), quantity, hostname, expire))
-        
+
         conn.commit()
 
         conn.close()
@@ -283,7 +283,7 @@ def update_asset(key_object):
                 sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
                 cursor.execute(sql_update, [setValue, updateIndex])
 
-    
+
         elif updateColumn == 'EXPIRES':
             if re.search((r"[\d]{1,2}/[\d]{1,2}/[\d]{2}"), setValue):
                 if databaseType == 'sqlite':
@@ -303,12 +303,12 @@ def update_asset(key_object):
 
             elif databaseType == 'postgres':
                 sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
-                cursor.execute(sql_update, [setValue, updateIndex])    
+                cursor.execute(sql_update, [setValue, updateIndex])
     except Exception as e:
         print(e)
 
     conn.commit()
-   
+
     conn.close()
 
 def select_asset(key_object):
@@ -359,7 +359,7 @@ def export_asset(export, key_object):
             file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
 
             #write database data to .csv
-            for row in selectAll:    
+            for row in selectAll:
                 file.write('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
 
             file.close()
@@ -373,12 +373,12 @@ def export_asset(export, key_object):
             file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
 
             selectAll = cursor.fetchall()
-            
+
             for row in selectAll:
                 write = (row[0], row[1], key_object.decrypt(row[2]), row[3], row[4], row[5])
 
                 file.write(str(write).replace('(', '').replace(')',''))
-                file.write('\n')  
+                file.write('\n')
 
             file.close()
 
@@ -456,6 +456,6 @@ if __name__ == "__main__":
         export_asset(export, key_object)
     else:
         build, assign = create_asset(name, hostname, license, quantity, expire)
-        
+
         add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), \
                 quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
