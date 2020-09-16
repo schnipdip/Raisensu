@@ -42,6 +42,8 @@ optional arguments:
   
   -u           Update an entry
   
+  -o           Select a specific asset(s) to return
+  
   -n NAME      Name of the License Product
   
   -a HOSTNAME  Name of the hostname the license is attached to
