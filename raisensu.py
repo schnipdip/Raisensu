@@ -305,7 +305,7 @@ def update_asset(key_object):
 
     conn.close()
 
-def select_asset(key_object):
+def view_asset(key_object):
     #conn = sqlite3.connect('asset_database.db')
     conn, cursor = decide_databaseType()
 
@@ -328,6 +328,61 @@ def select_asset(key_object):
 
     #TODO: add the ability to decrypt only what your unique secret.key can decrypt. Display everything else as encrypted.
     #for row in cursor:
+
+    conn.commit()
+
+    conn.close()
+
+def select_asset(key_object):
+    #Select a specific set of assets to view
+
+    #conn = sqlite3.connect('asset_database.db')
+    conn, cursor = decide_databaseType()
+
+    #get database type
+    databaseType = get_databaseType()
+
+    select_object = input('Select column [Name, License, Quantity, Hostname, Expires, Environment, Description]: ').lower()
+    object_value  = input ('Select the value from ' + select_object + ' (case sensative): ')
+    
+    if databaseType == 'sqlite':
+        if select_object == 'name' or select_object == 'license' or select_object == 'hostname' or select_object == 'expires' or select_object == 'environment' or select_object == 'description':
+            selectAll = conn.execute("SELECT * FROM ASSETS WHERE {0} LIKE '%{1}%' ORDER BY ID;".format(select_object, object_value))
+            for row in selectAll:
+                print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
+        
+        elif select_object == 'quantity':
+            selectAll = conn.execute("SELECT * FROM ASSETS WHERE {0} = '{1}' ORDER BY ID;".format(select_object, object_value))
+            for row in selectAll:
+                print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
+        
+        else:
+            print('Invalid Selection')
+            select_asset(key_object)
+    
+    elif databaseType == 'postgres':
+        if select_object == 'name' or select_object == 'license' or select_object == 'hostname' or select_object == 'expires' or select_object == 'environment' or select_object == 'description':
+            cursor.execute("SELECT * FROM ASSETS WHERE {0} LIKE '%{1}%' ORDER BY ID".format(select_object, object_value))
+            
+            selectAll = cursor.fetchall()
+
+            for row in selectAll:
+                print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
+        
+        elif select_object == 'quantity':
+            cursor.execute("SELECT * FROM ASSETS WHERE {0} = '{1}' ORDER BY ID".format(select_object, object_value))
+            
+            selectAll = cursor.fetchall()
+
+            for row in selectAll:
+                print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
+        
+        
+        else:
+            print('Invalid Selection')
+            select_asset(key_object)
+        
+            
 
     conn.commit()
 
@@ -388,6 +443,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', action='store_true', dest='database', help='Create a New Table if it has not been created already')
     parser.add_argument('-v', action='store_true', dest='view', help='View all entries')
     parser.add_argument('-u', action='store_true', dest='update', help='Update an entry')
+    parser.add_argument('-o', action='store_true', dest='select', help='Select a specific entry to return')
     parser.add_argument('-n', action='store', dest='name', type=str, help='Name of the License Product')
     parser.add_argument('-a', action='store', dest='hostname', type=str, help='Name of the hostname the license is attached to')
     parser.add_argument('-l', action='store', dest='license', type=str, help='License data')
@@ -413,14 +469,17 @@ if __name__ == "__main__":
     deleteAll   = result.deleteAll
     description = result.description
     env         = result.environment
+    select      = result.select
 
     #configure encryption
     key_object = get_encrypt()
 
     if update is True:
-        select_asset(key_object)
+        view_asset(key_object)
         update_asset(key_object)
     elif view is True:
+        view_asset(key_object)
+    elif select is True:
         select_asset(key_object)
     #check if database table has been set
     elif database is True:
@@ -435,7 +494,7 @@ if __name__ == "__main__":
             if name != '':
                 usrInput = input('Enter the ID of the Asset to delete or return list (y): ')
                 if usrInput == 'y' or usrInput == 'Y':
-                    select_asset(key_object)
+                    view_asset(key_object)
                 elif usrInput.isdigit():
                     #deletes user entry
                     del_asset(usrInput)
