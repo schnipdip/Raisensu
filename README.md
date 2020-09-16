@@ -69,7 +69,7 @@ optional arguments:
 7. Export assets to a .csv file: `python raisensu.py -e [location]`
 
 # Output
-![reisensu_img](https://funkyimg.com/i/373JH.png)
+![reisensu_img](https://funkyimg.com/i/37puS.png)
 
 # Configure Monitoring (optional)
 
