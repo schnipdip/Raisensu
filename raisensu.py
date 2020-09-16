@@ -79,12 +79,14 @@ def create_table():
     try:
         if databaseType == 'sqlite':
             sql_create_asset_table = ('''CREATE TABLE IF NOT EXISTS ASSETS (
-            ID        INTEGER       PRIMARY KEY AUTOINCREMENT,
-            NAME      VARCHAR(255)  NOT NULL,
-            LICENSE   VARCHAR(255)  NOT NULL,
-            QUANTITY  INT           NOT NULL,
-            HOSTNAME  VARCHAR(255)  NOT NULL,
-            EXPIRES   VARCHAR(255)  NOT NULL);''')
+            ID           INTEGER       PRIMARY KEY AUTOINCREMENT,
+            NAME         VARCHAR(255)  NOT NULL,
+            LICENSE      VARCHAR(255)  NOT NULL,
+            QUANTITY     INT           NOT NULL,
+            HOSTNAME     VARCHAR(255)  NOT NULL,
+            EXPIRES      VARCHAR(255)  NOT NULL,
+            ENVIRONMENT  TEXT          NOT NULL,
+            DESCRIPTION  TEXT          NOT NULL);''')
 
             cursor.execute(sql_create_asset_table)
 
@@ -95,12 +97,14 @@ def create_table():
             conn.close()
         elif databaseType == 'postgres':
             sql_create_asset_table = ('''CREATE TABLE IF NOT EXISTS ASSETS (
-            ID        SERIAL PRIMARY KEY,
-            NAME      TEXT  NOT NULL,
-            LICENSE   TEXT  NOT NULL,
-            QUANTITY  INT   NOT NULL,
-            HOSTNAME  TEXT  NOT NULL,
-            EXPIRES   TEXT  NOT NULL);''')
+            ID          SERIAL PRIMARY KEY,
+            NAME        TEXT   NOT NULL,
+            LICENSE     TEXT   NOT NULL,
+            QUANTITY    INT    NOT NULL,
+            HOSTNAME    TEXT   NOT NULL,
+            EXPIRES     TEXT   NOT NULL,
+            ENVIRONMENT TEXT   NOT NULL,
+            DESCRIPTION TEXT   NOT NULL);''')
 
             cursor.execute(sql_create_asset_table)
 
@@ -118,20 +122,23 @@ def get_csv(key_object):
     data = pd.read_csv('import.csv')
 
     #iterate through csv get variables
-    df = pd.DataFrame(data, columns=['name', 'license', 'hostname', 'quantity','expires'])
+    df = pd.DataFrame(data, columns=['name', 'license', 'hostname', 'quantity','expires', 'env', 'description'])
 
     counter = 0
     while counter < len(df):
-        name = df.loc[counter, 'name']
-        license = df.loc[counter, 'license']
-        hostname = df.loc[counter, 'hostname']
-        quantity = df.loc[counter, 'quantity']
-        expire = df.loc[counter, 'expires']
+        name        = df.loc[counter, 'name']
+        license     = df.loc[counter, 'license']
+        hostname    = df.loc[counter, 'hostname']
+        quantity    = df.loc[counter, 'quantity']
+        expire      = df.loc[counter, 'expires']
+        description = df.loc[counter, 'description']
+        env         = df.loc[counter, 'environment']
 
-        build, assign = create_asset(name, hostname, license, quantity, expire)
+        build, assign = create_asset(name, hostname, license, quantity, expire, env, description)
 
         add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), \
-                quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
+                quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object, \
+                env=build.get_environment(), description=build.get_description())
 
         counter += 1
 
@@ -141,14 +148,13 @@ def get_encrypt():
 
     return (key_object)
 
-def create_asset(name, hostname, license, quantity, expire):
-    build = buildAsset(name, license, quantity, expire)
+def create_asset(name, hostname, license, quantity, expire, env, description):
+    build = buildAsset(name, license, quantity, expire, env, description)
     assign = assignAsset(hostname)
 
     return (build, assign)
 
-def add_asset(name, hostname, license, quantity, expire, key_object):
-    #conn = sqlite3.connect('asset_database.db')
+def add_asset(name, hostname, license, quantity, expire, key_object, env, description):
     conn, cursor = decide_databaseType()
 
     #get database type
@@ -156,8 +162,8 @@ def add_asset(name, hostname, license, quantity, expire, key_object):
 
     if databaseType == 'sqlite':
         #Insert New Asset
-        conn.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
-                    VALUES (?, ?, ?, ?, ?)""",(name, key_object.encrypt(license), quantity, hostname, expire))
+        conn.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES, ENVIRONMENT, DESCRIPTION)\
+                    VALUES (?, ?, ?, ?, ?, ?, ?)""",(name, key_object.encrypt(license), quantity, hostname, expire, env, description))
 
         conn.commit()
 
@@ -170,8 +176,8 @@ def add_asset(name, hostname, license, quantity, expire, key_object):
         encrypt_license = encrypt_license.decode('utf-8')
 
         #Insert New Asset
-        cursor.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES)\
-                    VALUES (%s, %s, %s, %s, %s)""",(name, encrypt_license, quantity, hostname, expire))
+        cursor.execute("""INSERT INTO ASSETS(NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES, ENVIRONMENT, DESCRIPTION)\
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)""",(name, encrypt_license, quantity, hostname, expire, env, description))
 
         conn.commit()
 
@@ -240,11 +246,10 @@ def update_asset(key_object):
         :Param setValue - set the new value
     '''
 
-    updateIndex = input("Which Index (ID) would you like to update? ")
+    updateIndex  = input("Which Index (ID) would you like to update? ")
     updateColumn = input("Which Column would you like to update? ").upper()
-    setValue = input("New Value? ")
+    setValue     = input("New Value? ")
 
-    #conn = sqlite3.connect('asset_database.db')
     conn, cursor = decide_databaseType()
 
     cursor = conn.cursor()
@@ -252,7 +257,7 @@ def update_asset(key_object):
     #get database type
     databaseType = get_databaseType()
 
-    columns = ["ID","NAME","LICENSE","QUANTITY", "HOSTNAME", "EXPIRES"]
+    columns = ["ID","NAME","LICENSE","QUANTITY", "HOSTNAME", "EXPIRES", "ENVIRONMENT", "DESCRIPTION" ]
 
     try:
         #encrypt the license if they want to change it
@@ -310,7 +315,7 @@ def select_asset(key_object):
     if databaseType == 'sqlite':
         selectAll = conn.execute('SELECT * FROM ASSETS ORDER BY ID')
         for row in selectAll:
-            print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
+            print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
 
     elif databaseType == 'postgres':
         cursor.execute('SELECT * FROM ASSETS ORDER BY ID')
@@ -318,7 +323,7 @@ def select_asset(key_object):
         selectAll = cursor.fetchall()
 
         for row in selectAll:
-            print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5])
+            print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
 
 
     #TODO: add the ability to decrypt only what your unique secret.key can decrypt. Display everything else as encrypted.
@@ -345,11 +350,11 @@ def export_asset(export, key_object):
             file = open(export,'a+')
 
             #write column headers
-            file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
+            file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES, ENVIRONMENT, DESCRIPTION\n')
 
             #write database data to .csv
             for row in selectAll:
-                file.write('{0}, {1}, {2}, {3}, {4}, {5}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5]))
+                file.write('{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}\n'.format(str(row[0]), row[1], key_object.decrypt(row[2]), row[3], row[4], row[5], row[6], row[7]))
 
             file.close()
         elif databaseType == 'postgres':
@@ -359,12 +364,12 @@ def export_asset(export, key_object):
             file = open(export,'a+')
 
             #write column headers
-            file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES\n')
+            file.write('ID, NAME, LICENSE, QUANTITY, HOSTNAME, EXPIRES, ENVIRONMENT, DESCRIPTION\n')
 
             selectAll = cursor.fetchall()
 
             for row in selectAll:
-                write = (row[0], row[1], key_object.decrypt(row[2]), row[3], row[4], row[5])
+                write = (row[0], row[1], key_object.decrypt(row[2]), row[3], row[4], row[5], row[6], row[7])
 
                 file.write(str(write).replace('(', '').replace(')',''))
                 file.write('\n')
@@ -388,22 +393,26 @@ if __name__ == "__main__":
     parser.add_argument('-l', action='store', dest='license', type=str, help='License data')
     parser.add_argument('-q', action='store', dest='quantity', type=int, default=0, help='Total Number of licenses')
     parser.add_argument('-x', action='store', dest='expire', default=0, help='License expiration date')
-    parser.add_argument('-e', action='store', dest='export', type=str, help='Export SQL Database to CSV file')
+    parser.add_argument('-e', action='store', dest='export', type=str, help='Export SQL Database to CSV file [requires .csv file]')
+    parser.add_argument('-r', action='store', dest='description', type=str, help='Description of the license')
+    parser.add_argument('-s', action='store', dest='environment', type=str, help='Environment the license resides in')
 
     result = parser.parse_args()
 
-    name = result.name
-    hostname = result.hostname
-    license = result.license
-    quantity = result.quantity
-    delete = result.delete
+    name        = result.name
+    hostname    = result.hostname
+    license     = result.license
+    quantity    = result.quantity
+    delete      = result.delete
     spreadsheet = result.spreadsheet
-    database = result.database
-    view = result.view
-    update = result.update
-    export = result.export
-    expire = result.expire
-    deleteAll = result.deleteAll
+    database    = result.database
+    view        = result.view
+    update      = result.update
+    export      = result.export
+    expire      = result.expire
+    deleteAll   = result.deleteAll
+    description = result.description
+    env         = result.environment
 
     #configure encryption
     key_object = get_encrypt()
@@ -444,7 +453,8 @@ if __name__ == "__main__":
     elif export:
         export_asset(export, key_object)
     else:
-        build, assign = create_asset(name, hostname, license, quantity, expire)
+        build, assign = create_asset(name, hostname, license, quantity, expire, env, description)
 
         add_asset(name=build.get_name(), hostname=assign.get_hostname(), license=build.get_license(), \
-                quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object)
+                quantity=build.get_quantity(), expire=build.get_expire(), key_object=key_object, \
+                env=build.get_environment(), description=build.get_description() )
