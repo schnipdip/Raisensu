@@ -50,14 +50,19 @@ optional arguments:
   
   -q QUANTITY  Total Number of licenses
   
-  -x EXPIRE    License expiration date
+  -x EXPIRE    License expiration date [requires .csv file]
   
   -e EXPORT    Export SQL Database to CSV file
+  
+  -s ENVIRONMENT Environment the license resides in
+  
+  -r DESCRIPTION Description of the license
 ```
 # Examples
 
 1. Getting help: `python raisensu.py -h`
 2. Adding a new asset from command-line: `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 10 -x 12/31/2021` (`-a` is optional to add a host)
+3. Adding a new asset from command-line:  `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 1 -x 12/31/2021 -a Host01 -s 'Dev' -r 'License for Host01 in Dev' `
 
 ![example1](https://funkyimg.com/i/373Jh.png)
 
