@@ -1,5 +1,5 @@
 ![BuildStatus](https://img.shields.io/badge/build-success-brightgreen)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d01dd77641f1470ba362255f9c7d7a58)](https://app.codacy.com/manual/cjh30/Raisensu?utm_source=github.com&utm_medium=referral&utm_content=schnipdip/Raisensu&utm_campaign=Badge_Grade_Dashboard) [![Known Vulnerabilities](https://snyk.io/test/github/schnipdip/Raisensu/badge.svg)](https://snyk.io/test/github/schnipdip/Raisensu) 
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/schnipdip/Raisensu.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/schnipdip/Raisensu/context:python) [![Total alerts](https://img.shields.io/lgtm/alerts/g/schnipdip/Raisensu.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/schnipdip/Raisensu/alerts/) [![PyPI version](https://badge.fury.io/py/psycopg2.svg)](https://badge.fury.io/py/psycopg2)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/schnipdip/Raisensu.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/schnipdip/Raisensu/context:python) [![Total alerts](https://img.shields.io/lgtm/alerts/g/schnipdip/Raisensu.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/schnipdip/Raisensu/alerts/)
 
 ![reisensu_img](https://funkyimg.com/i/373GZ.png)
 
