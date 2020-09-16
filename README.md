@@ -85,6 +85,3 @@ optional arguments:
 
 ## TODO:
 
-- Select NAME output
-- Support Remote Database
-- Query and return Hostname
