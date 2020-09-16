@@ -61,8 +61,8 @@ optional arguments:
 # Examples
 
 1. Getting help: `python raisensu.py -h`
-2. Adding a new asset from command-line: `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 10 -x 12/31/2021` (`-a` is optional to add a host)
-3. Adding a new asset from command-line:  `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 1 -x 12/31/2021 -a Host01 -s 'Dev' -r 'License for Host01 in Dev' `
+2a. Adding a new asset from command-line: `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 10 -x 12/31/2021` (`-a` is optional to add a host)
+2b. Adding a new asset from command-line:  `python raisensu.py -n 'Product Name' -l 'xopi08infsdfpoi3409c' -q 1 -x 12/31/2021 -a Host01 -s 'Dev' -r 'License for Host01 in Dev' `
 
 ![example1](https://funkyimg.com/i/373Jh.png)
 
