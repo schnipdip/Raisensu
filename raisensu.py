@@ -450,10 +450,6 @@ def export_asset(export, key_object):
         print(e)
 
 if __name__ == "__main__":
-
-    #make logger accessable everywhere
-    global logger
-
     #get logger
     logger = logging.getLogger(__name__)
 

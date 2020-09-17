@@ -199,9 +199,6 @@ def get_sql_statement(config, key_object):
         exit(0)
 
 if __name__ == "__main__":
-    #make logger accessable everywhere
-    global logger
-
     #get logger
     logger = logging.getLogger(__name__)
 
@@ -215,7 +212,6 @@ if __name__ == "__main__":
 
     #add file handler to logger
     logger.addHandler(file_handler)
-
 
     #configparser
     config = get_configParser()
