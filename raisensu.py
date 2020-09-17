@@ -4,7 +4,12 @@ import pandas as pd
 import argparse
 import psycopg2
 import sqlite3
+import logging
+import getpass
 import re
+
+def get_loggedInUser():
+    return getpass.getuser()
 
 def get_configParser():
     import configparser
@@ -113,6 +118,8 @@ def create_table():
 
             #Close Database Connection
             conn.close()
+        
+        logger.info(get_loggedInUser() + ' created the ASSET database table.')
     except Exception as e:
         print(e)
         exit(0)
@@ -182,6 +189,8 @@ def add_asset(name, hostname, license, quantity, expire, key_object, env, descri
         conn.commit()
 
         conn.close()
+    
+    logger.info(get_loggedInUser() + ' inserted the asset ' + name)
 
 def del_asset(usrInput):
     #conn = sqlite3.connect('asset_database.db')
@@ -200,6 +209,7 @@ def del_asset(usrInput):
         conn.commit()
 
         conn.close()
+        
     elif databaseType == 'postgres':
         #Delete Asset
         cursor.execute("DELETE FROM ASSETS WHERE ID = %s;",(usrInput))
@@ -210,6 +220,8 @@ def del_asset(usrInput):
         conn.commit()
 
         conn.close()
+
+    logger.info(get_loggedInUser() + ' deleted the asset at Index ' + usrInput + ' from the column NAME.')
 
 def del_all_asset():
     #conn = sqlite3.connect('asset_database.db')
@@ -228,6 +240,7 @@ def del_all_asset():
         conn.commit()
 
         conn.close()
+
     elif databaseType == 'postgres':
         #Delete Asset
         cursor.execute("DELETE FROM ASSETS;")
@@ -238,6 +251,8 @@ def del_all_asset():
         conn.commit()
 
         conn.close()
+
+    logger.info(get_loggedInUser() + ' deleted all assets.')
 
 def update_asset(key_object):
     '''
@@ -262,7 +277,8 @@ def update_asset(key_object):
     try:
         #encrypt the license if they want to change it
         if updateColumn not in columns:
-            raise Exception ("Attempted to update unknown column: {0}".format(updateColumn))
+            print('Invalid Column Name')
+            raise Exception (logger.info(get_loggedInUser() + " failed to update unknown column: {0}".format(updateColumn)))
 
         elif updateColumn == 'LICENSE':
             #encrypt updated value
@@ -276,7 +292,6 @@ def update_asset(key_object):
             elif databaseType == 'postgres':
                 sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
                 cursor.execute(sql_update, [setValue, updateIndex])
-
 
         elif updateColumn == 'EXPIRES':
             if re.search((r"[\d]{1,2}/[\d]{1,2}/[\d]{2}"), setValue):
@@ -298,6 +313,8 @@ def update_asset(key_object):
             elif databaseType == 'postgres':
                 sql_update = "UPDATE ASSETS SET {0} = %s WHERE ID = %s;".format(updateColumn)
                 cursor.execute(sql_update, [setValue, updateIndex])
+
+        logger.info(get_loggedInUser() + ' updated column ' + updateColumn + ' at index ' + updateIndex + ' with the value ' + setValue + '.')
     except Exception as e:
         print(e)
 
@@ -377,12 +394,9 @@ def select_asset(key_object):
             for row in selectAll:
                 print('ID:', row[0], ' Name:', row[1], ' License:', key_object.decrypt(row[2]), ' Quantity:', row[3], ' Hostname:', row[4], ' Expires:', row[5], 'Environment:', row[6], 'Description:', row[7])
         
-        
         else:
             print('Invalid Selection')
             select_asset(key_object)
-        
-            
 
     conn.commit()
 
@@ -431,10 +445,29 @@ def export_asset(export, key_object):
 
             file.close()
 
+        logger.info(get_loggedInUser() + ' exported database to ' + export)
     except Exception as e:
         print(e)
 
 if __name__ == "__main__":
+
+    #make logger accessable everywhere
+    global logger
+
+    #get logger
+    logger = logging.getLogger(__name__)
+
+    #set log level
+    logger.setLevel(logging.INFO)
+
+    #define file handler and set formatter
+    file_handler = logging.FileHandler('raisensu_log.log')
+    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+    file_handler.setFormatter(formatter)
+
+    #add file handler to logger
+    logger.addHandler(file_handler)
+
 
     parser = argparse.ArgumentParser(description='Asset Management Database')
     parser.add_argument('-c', action='store_true', dest='spreadsheet', help='Parse through import.csv file')
