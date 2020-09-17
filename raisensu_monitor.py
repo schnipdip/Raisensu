@@ -57,24 +57,6 @@ def get_encrypt():
 
     return key_object
 
-def get_logger():
-    #creates logger object
-    logger = logging.getLogger(__name__)
-
-    return logger
-
-def set_logger(logger):
-    #set log level
-    logger.setLevel(logging.INFO)
-
-    #define file handler and set formatter
-    file_handler = logging.FileHandler('raisensu_log.log')
-    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
-    file_handler.setFormatter(formatter)
-
-    #add file handler to logger
-    logger.addHandler(file_handler)
-
 def get_databaseType():
     #get database type
     databaseType = config['database_type']['type']
@@ -98,6 +80,7 @@ def decide_databaseType():
 def get_smtp_state(config):
     smtpState = config['email']['enable_email'].upper()
 
+    logger.info('SMTP STATE INFORMATION ' + smtpState)
     return smtpState
 
 def get_smtp(config):
@@ -153,7 +136,7 @@ def diff_dates(date_today, comp_date):
     #return remaining days
     return abs(date_time_comp - date_time_today).days
 
-def get_sql_statement(config, key_object, logger):
+def get_sql_statement(config, key_object):
     databaseType = get_databaseType()
 
     conn, cursor = decide_databaseType()
@@ -216,9 +199,23 @@ def get_sql_statement(config, key_object, logger):
         exit(0)
 
 if __name__ == "__main__":
-    #logger
-    logger = get_logger()
-    set_logger(logger)
+    #make logger accessable everywhere
+    global logger
+
+    #get logger
+    logger = logging.getLogger(__name__)
+
+    #set log level
+    logger.setLevel(logging.INFO)
+
+    #define file handler and set formatter
+    file_handler = logging.FileHandler('raisensu_alert_log.log')
+    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+    file_handler.setFormatter(formatter)
+
+    #add file handler to logger
+    logger.addHandler(file_handler)
+
 
     #configparser
     config = get_configParser()
@@ -229,7 +226,7 @@ if __name__ == "__main__":
     #encryption
     key_object = get_encrypt()
 
-    notify = get_sql_statement(config, key_object, logger)
+    notify = get_sql_statement(config, key_object)
 
     #smptp
     smtpState = get_smtp_state(config)
