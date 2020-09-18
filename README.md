@@ -82,7 +82,7 @@ optional arguments:
 # Troubleshooting
 
 1. (Linux) If you are having trouble with `generate_key.py`, issue the following command: `dd if=/dev/urandom bs=32 count=1 2>/dev/null | openssl base64 > secret.key`
-2. (Linux) If you are having trouble installing the pypip library psycopg2, use the following command `pip3 install psycopg2-binary`
+2. (Linux) If you are having trouble installing the pypip library psycopg2, use the following command `pip3 install libpq-dev psycopg2-binary psycopg2`
 3. For some reason, `pandas` isn't installing via the `requirements.txt` file. Do a `pip3 install pandas` to install Pandas.
 
 ## TODO:
