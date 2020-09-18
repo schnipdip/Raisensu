@@ -6,7 +6,7 @@
 mkdir /opt/Raisensu
 
 #Move Raisensu files to /usr/local/bin
-cp ../../Raisensu /opt/
+cp -R ../../Raisensu /opt/
 
 #Copy raisensu_monitor.serivce file to /lib/systemd/system/
 cp raisensu_monitor.service /lib/systemd/system/raisensu_monitor.service
