@@ -1,0 +1,7 @@
+cryptography
+configparser
+argparse
+pysqlite3
+pandas
+regex
+smtp

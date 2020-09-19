@@ -22,3 +22,9 @@ systemctl start raisensu_monitor.service
 
 #Enable raisensu_monitor.service to start at start-up
 systemctl enable raisensu_monitor.service
+
+#Remove Raisensu/windows directory
+rm -r /opt/Raisensu/windows
+
+#Echo new access location
+echo "Raisensu has been installed in /opt/Raisensu"
