@@ -22,7 +22,9 @@ rm -r /opt/Raisensu/windows
 
 #Echo new access location
 echo "Raisensu has been installed in /opt/Raisensu"
-echo "Move to /opt/Raisensu/linux/"
+echo ""
+echo "Change Directories to /opt/Raisensu/linux/"
+echo ""
 echo "Perform the following steps in this order:"
 echo "sudo python3 generate_key.py"
 echo "sudo python3 raisensu.py -t"
