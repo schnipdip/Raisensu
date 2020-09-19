@@ -21,10 +21,10 @@ systemctl daemon-reload
 rm -r /opt/Raisensu/windows
 
 #Echo new access location
-echo "Raisensu has been installed in /opt/Raisensu\n"
-echo "Move to /opt/Raisensu/linux/\n"
-echo "Perform the following steps in this order:\n"
-echo "sudo python3 generate_key\n"
-echo "sudo python3 raisensu.py -t\n"
-echo "sudo systemctl start raisensu_monitor.service\n"
+echo "Raisensu has been installed in /opt/Raisensu"
+echo "Move to /opt/Raisensu/linux/"
+echo "Perform the following steps in this order:"
+echo "sudo python3 generate_key"
+echo "sudo python3 raisensu.py -t"
+echo "sudo systemctl start raisensu_monitor.service"
 echo "systemctl enable raisensu_monitor.service"
