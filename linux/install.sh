@@ -30,12 +30,6 @@ echo "Restarting systemd daemon"
 systemctl daemon-reload
 echo "Systemd daemon reloaded"
 
-#Start raisensu_timer.service
-systemctl start raisensu_timer.service
-
-#Enable raisensu_timer.service at start
-systemctl enable raisensu_timer.service
-
 #Remove Raisensu/windows directory
 rm -r /opt/Raisensu/windows
 echo "Removed /opt/Raisensu/windows directory"
@@ -52,3 +46,5 @@ echo "sudo python3 generate_key.py"
 echo "sudo python3 raisensu.py -t"
 echo "sudo systemctl start raisensu_monitor.service"
 echo "sudo systemctl enable raisensu_monitor.service"
+echo "sudo systemctl start raisensu_timer.service"
+echo "sudo systemctl enable raisensu_timer.service"
