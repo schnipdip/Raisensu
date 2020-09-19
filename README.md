@@ -85,5 +85,8 @@ optional arguments:
 2. (Linux) If you are having trouble installing the pypip library psycopg2, use the following command `pip3 install libpq-dev psycopg2-binary psycopg2`
 3. For some reason, `pandas` isn't installing via the `requirements.txt` file. Do a `pip3 install pandas` to install Pandas.
 
-## TODO:
+# Extra Functionality
 
+1. Achieving HA for Raisensu Linux services is possible with Corosync and Pacemaker. The two services files for Raisensu are:
+   - raisensu_monitor.service
+   - raisensu_timer.timer
