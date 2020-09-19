@@ -10,7 +10,7 @@ import smtplib
 
 def get_configParser():
     config = configparser.ConfigParser()
-    config.read('monitor_settings.ini')
+    config.read('/opt/Raisensu/linux/monitor_settings.ini')
 
     return config
 
@@ -22,7 +22,7 @@ def connect_sqlite():
 
     sqliteDatabase = config['database_sqlite']['sqlite_database']
 
-    conn = sqlite3.connect(sqliteDatabase)
+    conn = sqlite3.connect('/opt/Raisensu/linux/' + sqliteDatabase)
     cursor = conn.cursor()
 
     return conn, cursor
@@ -53,7 +53,7 @@ def connect_postgres():
 
 def get_encrypt():
     #create encrypt object
-    key_object = encrypto('secret.key')
+    key_object = encrypto('/opt/Raisensu/linux/secret.key')
 
     return key_object
 
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     logger.setLevel(logging.INFO)
 
     #define file handler and set formatter
-    file_handler = logging.FileHandler('raisensu_alert_log.log')
+    file_handler = logging.FileHandler('/opt/Raisensu/linux/raisensu_alert_log.log')
     formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
     file_handler.setFormatter(formatter)
 
