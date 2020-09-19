@@ -22,13 +22,19 @@ cp raisensu_timer.service /lib/systemd/system/raisensu_timer.service
 echo "Copied the raisensu_timer.service to systemd"
 
 #Change permissions for raisensu_timer.serivce file
-chmod 644 /lib/systemd/system/raisensu_time.service
+chmod 644 /lib/systemd/system/raisensu_timer.service
 echo "Modified the permissions on raisensu_timer.service"
 
 #Restart systemd daemon
 echo "Restarting systemd daemon"
 systemctl daemon-reload
 echo "Systemd daemon reloaded"
+
+#Start raisensu_timer.service
+systemctl start raisensu_timer.service
+
+#Enable raisensu_timer.service at start
+systemctl enable raisensu_timer.service
 
 #Remove Raisensu/windows directory
 rm -r /opt/Raisensu/windows
