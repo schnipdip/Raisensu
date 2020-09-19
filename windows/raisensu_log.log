@@ -1,0 +1,5 @@
+2020-09-18 21:47:07,032 : INFO : __main__ : Chris Herzog created the ASSET database table.
+2020-09-18 21:47:37,016 : INFO : __main__ : Chris Herzog inserted the asset test
+2020-09-18 21:49:14,434 : INFO : __main__ : Chris Herzog created the ASSET database table.
+2020-09-18 21:49:22,856 : INFO : __main__ : Chris Herzog inserted the asset test
+2020-09-18 21:49:41,250 : INFO : __main__ : Chris Herzog exported database to export.csv
