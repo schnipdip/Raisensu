@@ -2,6 +2,8 @@ from asset import buildAsset, assignAsset
 from encryption import encrypto
 import pandas as pd
 import argparse
+import psycopg2
+import sqlite3
 import logging
 import getpass
 import re
@@ -64,12 +66,8 @@ def decide_databaseType():
     databaseType = get_databaseType()
 
     if databaseType == 'sqlite':
-        import sqlite3
-
         conn, cursor = connect_sqlite()
     elif databaseType == 'postgres':
-        import psycopg2
-        
         conn, cursor = connect_postgres()
     else:
         print('Unsupported Database Type.')
