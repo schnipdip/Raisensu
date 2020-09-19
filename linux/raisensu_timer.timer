@@ -3,7 +3,7 @@ Description=Run Raisensu Monitor every 720m (12h)
 Requires=raisensu_monitor.service
 [Timer]
 Unit=raisensu_monitor.service
-OnUnitInactiveSec=15m
+OnUnitActiveSec=720m
 AccuracySec=1s
 [Install]
 WantedBy=timers.target
