@@ -4,7 +4,7 @@ After cloning the Raisensu repository, navigate to:
 
 In order to provision Raisensu properly, issue the following command with suder privileges:
 
-`sudo bash install.sh`
+`sudo sh install.sh`
 
 Lastly, follow along with the end requirements that the install.sh provides.
 
